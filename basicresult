@@ -251,7 +251,6 @@ for r in raws:
         for t in temp:
             labeltotal.append(t.Activity)
 #%%
-
 "Make the giant feature list"
 feature_all = list()
 for each in windowtotal:
