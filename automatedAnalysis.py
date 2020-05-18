@@ -295,6 +295,8 @@ def init_feature_names():
                                        'anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot','median-lateral mean difference',
                                        'median-lateral correlation coefficient left foot','median-lateral correlation coefficient right foot',
                                        'mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness','double float phase duration','pressure difference between foot landing and lifting']
+    to_recomp = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot','median-lateral mean difference','median-lateral correlation coefficient left foot',
+                 'median-lateral correlation coefficient right foot','mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness','double float phase duration','pressure difference between foot landing and lifting']
     return columnNames,to_recomp
 
 '''Make a feature list'''
