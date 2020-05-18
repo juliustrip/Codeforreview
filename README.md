@@ -13,13 +13,11 @@ Jupyter notebook
 ## Gettig Start
 * Clone the repository.
 * Clone the raw foot pressure data.
-* Run the code in the terminal from the directory of **automatedAnalysis.py** for result of different window size using following comment.
+* Prepare two dirctory, one for result of different window size, another one for result of different configuration and feature numbers.
+* Run the code in the terminal from the directory of **automatedAnalysis.py** 
+
 ```bash
-python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_different_window_size/ [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
-```
-* Run the code in the terminal from the directory of **automatedAnalysis.py** for result of different configurations and feature numbers using following comment.
-```bash
-python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_different_configs/
+python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_different_configs/ /DIR/result_of_different_window_size/ 
 ```
 * Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
 
