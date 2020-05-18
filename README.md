@@ -3,16 +3,21 @@ This repository contains code for data generation and the Machine Learning part 
 
 ## Contents of the repository
 * **automatedAnalysis.py** - library defining functions for reading data from experiments, extract features and perform the ML step (learning, evaluating and progressive feature removal). Can evaluate multiple sensor configurations in parallel, up to the maximum number of threads availalble.
-* **FiguresRerun.ipynb** - jupyter notebook containing code for the analysis of ML results and figure plotting.
+* **FiguresRerun.ipynb** - jupyter notebook containing code for the analysis of Mechine Learning results and figure plotting.
 
 ## Prerequisites
 Python 3 (>= 3.6)
+
 Jupyter notebook
 
 ## Gettig Start
 * Clone the repository.
 * Clone the raw foot pressure data.
-* Run the code in the terminal open from the directory of **automatedAnalysis.py**
+* Run the code in the terminal open from the directory of **automatedAnalysis.py** for result.
 ```bash
 python3 automatedAnalysis.py /DIR_of_foot_pressure_raw_data /DIR_of_result
 ```
+* Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
+
+## Versioning
+
