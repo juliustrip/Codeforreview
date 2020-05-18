@@ -15,7 +15,7 @@ Jupyter notebook
 * Clone the raw foot pressure data.
 * Run the code in the terminal open from the directory of **automatedAnalysis.py** for result.
 ```bash
-python3 automatedAnalysis.py /DIR_of_foot_pressure_raw_data /DIR_of_result
+python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result/
 ```
 * Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
 
