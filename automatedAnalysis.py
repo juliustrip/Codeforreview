@@ -292,8 +292,7 @@ def init_feature_names():
                                        'number of peaks right lateral forefoot','average peak interval right lateral forefoot','SD of peak interval right lateral forefoot','average peak magnitude right lateral forefoot','SD of peak magnitude right lateral forefoot','average peak width right lateral forefoot','SD of peak width right lateral forefoot',
                                        'number of peaks right lateral midfoot','average peak interval right lateral midfoot','SD of peak interval right lateral midfoot','average peak magnitude right lateral midfoot','SD of peak magnitude right lateral midfoot','average peak width right lateral midfoot','SD of peak width right lateral midfoot',
                                        'number of peaks right heel','average peak interval right heel','SD of peak interval right heel','average peak magnitude right heel','SD of peak magnitude right heel','average peak width right heel','SD of peak width right heel']
-    to_recomp = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot','median-lateral mean difference','median-lateral correlation coefficient left foot',
-                 'median-lateral correlation coefficient right foot','mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness','double float phase duration','pressure difference between foot landing and lifting']
+    to_recomp = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot','median-lateral mean difference','median-lateral correlation coefficient left foot','median-lateral correlation coefficient right foot','mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness','double float phase duration','pressure difference between foot landing and lifting']
     return columnNames,to_recomp
 
 '''Make a feature list'''
@@ -329,7 +328,7 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
                 featureforone.append(i)
             featuretotAP.append(featureforone)
         if len(featureforone)!= 0:
-            df_AP = pd.DataFrame(featuretotAP,columns = ['APdiff','APcoraL','APcoraR'])
+            df_AP = pd.DataFrame(featuretotAP,columns = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot'])
             df_featureplus = pd.concat([df_featureplus, df_AP], axis=1, sort=False)
         
     if 'LMdiff' not in availableFeatureNames:    
@@ -341,7 +340,7 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
                 featureforone.append(i)
             featuretotLM.append(featureforone)
         if len(featureforone)!= 0:
-            df_LM = pd.DataFrame(featuretotLM,columns = ['LMdiff','LMcoraL','LMcoraR'])
+            df_LM = pd.DataFrame(featuretotLM,columns = ['median-lateral mean difference','median-lateral correlation coefficient left foot','median-lateral correlation coefficient right foot'])
             df_featureplus = pd.concat([df_featureplus,df_LM], axis=1, sort=False)        
         
     featuretotFFT = []    
@@ -351,13 +350,13 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
         for i in temp:
             featureforone.append(i)
         featuretotFFT.append(featureforone)
-    df_FFT = pd.DataFrame(featuretotFFT,columns = ['fftmean','fftstd','fftweight','fftennergy','fftskewness'])
+    df_FFT = pd.DataFrame(featuretotFFT,columns = ['mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness'])
     df_featureplus = pd.concat([df_featureplus,df_FFT], axis=1, sort=False)
 
     featuregatephase = []
     for window in windowtotal:
         featuregatephase.append([overlappingrate(window,availableSensors),instepfeature(window,availableSensors)])
-    df_gatephase = pd.DataFrame(featuregatephase,columns=['overlap','inerstepinterval'])
+    df_gatephase = pd.DataFrame(featuregatephase,columns=['double float phase duration','pressure difference between foot landing and lifting'])
     df_featureplus = pd.concat([df_featureplus,df_gatephase], axis = 1, sort=False)
         
     return df_featureplus
@@ -555,7 +554,7 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)                                                                                                                                                                                         
     sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)                                            
-    sample = sample.fillna(0)                                                                                                            
+    sample = sample.fillna(0)                                                                                                                   
     totalfeatures = len(sample.columns) - len(df_label.columns)
     scores,preds,reals,featureimportance = base_train_evaluate(sample,training_subjects_assigments, nRepeats = 20, nTrees = nTrees)
     df_score = pd.DataFrame(scores,columns = [totalfeatures])
@@ -574,12 +573,12 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
         cm = confusion_matrix(reals[i], preds[i])
         cmnmlzd.append(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis])
 
-    print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #Add up predicted activities and true activities in 100 run.
+#    print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #Add up predicted activities and true activities in 100 run.
     meancm = sum(cmnmlzd)/len(cmnmlzd)#Calculate confusion matrix after 100 runs
-    with sns.axes_style("whitegrid",{'axes.grid': False}):
-        fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
-        plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures)+'.pdf',format="pdf")
-        plt.close()
+#    with sns.axes_style("whitegrid",{'axes.grid': False}):
+#        fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
+#        plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures)+'.pdf',format="pdf")
+#        plt.close()
     np.savetxt(output_folder+'overall_true_pred_'+configName+'_'+str(totalfeatures)+'.dat',meancm,delimiter=',')
         #with open('overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat','w') as savefile:                                                                                                
         #    savefile.write(str(overall_true_categories))                                                                                                                                                   
@@ -616,10 +615,10 @@ def full_run(availableSensors,training_subjects_assigments, windowtotal,df_featu
             
         print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) 
         meancm = sum(cmnmlzd)/len(cmnmlzd)
-        with sns.axes_style("whitegrid",{'axes.grid': False}):
-            fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
-            plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures-nFeatures)+'.pdf',format="pdf")
-            plt.close()
+#        with sns.axes_style("whitegrid",{'axes.grid': False}):
+#            fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
+#            plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures-nFeatures)+'.pdf',format="pdf")
+#            plt.close()
         np.savetxt(output_folder+'overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat',meancm,delimiter=',')
         #with open('overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat','w') as savefile:
         #    savefile.write(str(overall_true_categories))
@@ -633,9 +632,11 @@ if __name__ == '__main__':
 
     output_folder = 'output/'
     nTrees = 100
-    windowLength = [2000] #Pick up the intrested window lenght
-    #windowLength = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
+    windowLength = [2000] 
+    windowLength_multi = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
     
+
+
     availableThreads = psutil.cpu_count()
 
 
@@ -643,10 +644,9 @@ if __name__ == '__main__':
     if basePath == None:
         print("Error: basePath not set. Please set path.")
         exit()
-    if len(sys.argv) > 2:
-        output_folder = sys.argv[2]
-    if len(sys.argv) > 3:
-        windowLength = [int(sys.argv[3])]
+    output_folder = sys.argv[2]
+    output_folder_window = sys.argv[3]
+
     totalFeatures = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength]
     #windowtotal, df_feature, df_label = setup_evaluation(basePath,windowLength=windowLength)
     featureNames = list(totalFeatures[0][2].columns)
@@ -680,7 +680,6 @@ if __name__ == '__main__':
         f.flush()
 
     for elem in totalFeatures:
-    
 
         elem[2].loc[elem[2].Activity == 'walkF','Activity'] = 'walk'
         elem[2].loc[elem[2].Activity == 'walkN','Activity'] = 'walk'
@@ -692,12 +691,26 @@ if __name__ == '__main__':
     def temp_run(availableSensors):
         full_run(availableSensors,training_subjects_assigments, totalFeatures[0][0],totalFeatures[0][1],totalFeatures[0][2],output_folder = output_folder,nTrees = nTrees)
     def temp_run_fullfeatures(elem):
-        full_run(interestConfig[-1],training_subjects_assigments, elem[0],elem[1],elem[2],output_folder = output_folder+str(len(elem[0][0]))+"_",nTrees = nTrees)
-    with Pool(availableThreads) as pool:
-        if len(windowLength) > 1:
-            pool.map(temp_run_fullfeatures,totalFeatures)
-        else:
-            pool.map(temp_run,interestConfig)
+        maxfeature_run(interestConfig[-1],training_subjects_assigments, elem[0],elem[1],elem[2],output_folder = output_folder_window + str(len(elem[0][0]))+"_",nTrees = nTrees)
+    
+#    with Pool(availableThreads) as pool:
+#        pool.map(temp_run,interestConfig)
+    
+    
+    totalFeatures_multi_win = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength_multi]
+    for elem in totalFeatures_multi_win:
+
+        elem[2].loc[elem[2].Activity == 'walkF','Activity'] = 'walk'
+        elem[2].loc[elem[2].Activity == 'walkN','Activity'] = 'walk'
+        elem[2].loc[elem[2].Activity == 'jog','Activity'] = 'run'
+        elem[2].loc[elem[2].Activity == 'nonlocal','Activity'] = 'housework'
+        elem[2].loc[elem[2].Activity == 'sit','Activity'] = 'sitting'
+
+        labels = ['upstairs', 'downstairs', 'housework', 'run', 'sitting', 'standing', 'upslope', 'cycling','walk'] #Renewed Label list
+
+        temp_run_fullfeatures(elem)
+        
+    
 
 
     print('Strart time',start_time,'end time',time.time())
