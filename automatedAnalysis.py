@@ -556,7 +556,7 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)                                                                                                                                                                                         
     sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)                                            
-    sample = sample.fillna(0)  zero                                                                                                                  
+    sample = sample.fillna(0)                                                                                                            
     totalfeatures = len(sample.columns) - len(df_label.columns)
     scores,preds,reals,featureimportance = base_train_evaluate(sample,training_subjects_assigments, nRepeats = 20, nTrees = nTrees)
     df_score = pd.DataFrame(scores,columns = [totalfeatures])
