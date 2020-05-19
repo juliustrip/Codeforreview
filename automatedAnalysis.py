@@ -693,8 +693,8 @@ if __name__ == '__main__':
     def temp_run_fullfeatures(elem):
         maxfeature_run(interestConfig[-1],training_subjects_assigments, elem[0],elem[1],elem[2],output_folder = output_folder_window + str(len(elem[0][0]))+"_",nTrees = nTrees)
     
-#    with Pool(availableThreads) as pool:
-#        pool.map(temp_run,interestConfig)
+    with Pool(availableThreads) as pool:
+        pool.map(temp_run,interestConfig)
     
     
     totalFeatures_multi_win = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength_multi]
