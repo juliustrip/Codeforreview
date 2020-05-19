@@ -10,6 +10,7 @@ Python 3 (>= 3.6)
 
 Jupyter notebook
 
+Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, multiprocessing, psutil, sys, os, glob
 ## Gettig Start
 * Clone the repository.
 * Clone the raw foot pressure data.
@@ -21,5 +22,5 @@ python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_differe
 ```
 * Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
 
-## Versioning
+
 
