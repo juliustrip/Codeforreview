@@ -24,6 +24,6 @@ Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, mu
 python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_different_configs/ /DIR/result_of_different_window_size/ 
 ```
 * Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
-
+* Single forest results are not generated in main analysis. For the sake of examples shown in Figure9B, single forest results have been gengerated separetely in the repository with foot pressure data.
 
 
