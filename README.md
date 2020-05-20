@@ -1,10 +1,13 @@
-# Code for SmartShoes paper
-This repository contains code for data generation and the Machine Learning part of the smart shoes project. It also contain code for result analysing.
+# Code for the smart shoe paper
+This repository contains:
+1) a program processing raw data, running the random forest training-evaluation treatment and storing the results of the smart shoe project.
+2) a notebook for generating figure panels included in the manuscript.
 
 
-## Contents of the repository
-* **automatedAnalysis.py** - library defining functions for reading data from experiments, extract features and perform the ML step (learning, evaluating and progressive feature removal). Can evaluate multiple sensor configurations in parallel, up to the maximum number of threads availalble.
-* **FiguresRerun.ipynb** - jupyter notebook containing code for the analysis of Mechine Learning results and figure plotting.
+
+## Content of the repository
+* **automatedAnalysis.py** - This program contains a library of functions reading the raw data, extracting features, performing the machine learning treatment (training, evaluation), and storing the results. It automatically manages the feature reduction stepping process and can evaluate multiple sensor configurations, up to the maximum number of threads available.
+* **FiguresRerun.ipynb** - This Jupyter notebook contains functions and pieces of code for generating the figure panels showed in the manuscript. The output of **automatedAnalysis.py** are used as inputs. The generation of fig.9B panels used a different set of inputs, also provided in the data repository.
 
 ## Prerequisites
 Python 3 (>= 3.6)
@@ -12,16 +15,17 @@ Python 3 (>= 3.6)
 Jupyter notebook
 
 Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, multiprocessing, psutil, sys, os, glob
-## Gettig Start
+
+## Getting Start
 * Clone the repository.
-* Clone the raw foot pressure data.
-* Prepare two dirctory, one for result of different window size, another one for result of different configuration and feature numbers.
+* Clone the raw foot pressure data ("FootPressureRawData") from the data repository.
+* Prepare two directories, one for storing the results of the "window length" analysis, one for storing the results of the "sensor configuration and feature number reduction" analysis.
 * Run the code in the terminal from the directory of **automatedAnalysis.py** 
 
 ```bash
 python3 automatedAnalysis.py /DIR/foot_pressure_raw_data/ /DIR/result_of_different_configs/ /DIR/result_of_different_window_size/ 
 ```
-* Run **FiguresRerun.ipynb** in jupyter notebook to generate reusult and figures.
-* Single forest results are not generated in main analysis. For the sake of examples shown in Figure9B, single forest results have been gengerated separetely in the repository with foot pressure data.
+* If needed, Run **FiguresRerun.ipynb** in jupyter notebook to generate figure panels.
+* Single forest results are not stored by **automatedAnalysis.py** in main analysis. For the sake of single examples shown in Figure9B, single forest performance detailed statistics results have been generated separetely. These results are available in the data repository ("one_config").
 
 
