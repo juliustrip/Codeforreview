@@ -6,7 +6,7 @@ This repository contains:
 
 ## Content of the repository
 * **automatedAnalysis.py** - This program contains a library of functions reading the raw data, extracting features, performing the machine learning treatment (training, evaluation), and storing the results. It automatically manages the feature reduction stepping process and can evaluate multiple sensor configurations, up to the maximum number of threads available.
-* **FiguresRerun.ipynb** - This Jupyter notebook contains functions and pieces of code for generating the figure panels showed in the manuscript. The output of **automatedAnalysis.py** are used as inputs. The generation of fig.9B panels used a different set of inputs, also provided in the data repository.
+* **FigurePanels.ipynb** - This Jupyter notebook contains functions and pieces of code for generating the figure panels showed in the manuscript. The output of **automatedAnalysis.py** are used as inputs. The generation of fig.9B panels used a different set of inputs, also provided in the data repository.
 
 ## Prerequisites
 Python 3 (>= 3.6)
@@ -26,6 +26,6 @@ Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, mu
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ /DIR/window_length_results/ 
 ```
-* You can run **FiguresRerun.ipynb** in jupyter notebook to generate figure panels. Single forest results are not stored by **automatedAnalysis.py** in main analysis. For the sake of examples shown in Figure9B, detailed single forest performance statistics have been generated separetely. These results are available in the data repository ("one_config").
+* You can run **FigurePanels.ipynb** in jupyter notebook to generate figure panels. Single forest results are not stored by **automatedAnalysis.py** in main analysis. For the sake of examples shown in Figure9B, detailed single forest performance statistics have been generated separetely. These results are available in the data repository ("one_config").
 
 
