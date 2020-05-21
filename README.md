@@ -21,11 +21,11 @@ Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, mu
 * Prepare two folders:
 1) /DIR/window_length_results/ for storing the results of the "window length" analysis
 2) /DIR/config_feat_results/ for storing the results of the "sensor configuration and feature number reduction" analysis.
-* Run the code in the terminal from the directory of **automatedAnalysis.py** with following comment to get results of the "window length" analysis.(Example for Linux users.)
+* Run the code in the terminal from the directory of **automatedAnalysis.py** with following command to get results of the "window length" analysis.(Example for Linux users.)
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/window_length_results/ 
 ```
-* Run the code in the terminal from the directory of **automatedAnalysis.py** with following comment to get results of the "sensor configuration and feature number reduction" analysis when using 20 seconds of window size.(Example for Linux users.)
+* Run the code in the terminal from the directory of **automatedAnalysis.py** with following command to get results of the "sensor configuration and feature number reduction" analysis when using 20 seconds of window size.(Example for Linux users.)
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 2000
 ```
