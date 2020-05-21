@@ -31,14 +31,16 @@ import sys
 import os
 import glob
 
+
     
 '''Identify functions'''
 def instepfeature(window,availableSensors):
     "The average difference in one step for all steps in a window"
-    "First count step then calculate each step"
+    "...."
     def stepcounting(x):
+        "sumyl dosen't mean any about LEFT, it is just a sum of halfwindow, it could be L or R"
         A = x.max(axis = 1)
-        A[A<1] = 0     
+        A[A<1] = 0       
         count = 1
         start = 0
         step = []
@@ -59,7 +61,7 @@ def instepfeature(window,availableSensors):
                             if t > 10:
                                 step.append(x[start:stop+1])    
         return step
-    "If in one step there are more than two peaks, the difference between the last one and the first one"
+    
     def avepeakdiff(step):
         if step != []:
             peakdiff = []
@@ -78,7 +80,7 @@ def instepfeature(window,availableSensors):
     avL = availableSensors[[i in list(range(7)) for i in availableSensors]]
     avR = availableSensors[[i in list(range(7,14)) for i in availableSensors]]
     yl = np.array(window[:,avL])
-    yr = np.array(window[:,avR]) 
+    yr = np.array(window[:,avR])
     Lstep = stepcounting(yl)
     Rstep = stepcounting(yr)
     if (avepeakdiff(Lstep)+avepeakdiff(Rstep))/2  :
@@ -90,10 +92,9 @@ def instepfeature(window,availableSensors):
 def inerpeakinfo(window):
     "Peak intervals"
     def inersensorpeakinfo(single):
-        isf = []
+        isf = [] 
         peaks, properties = scipy.signal.find_peaks(single, distance = 30,prominence=2*np.std(single),width=0,rel_height=0.7)
-
-        "Total number of peaks"
+        "Total # of peaks"
         ft_pk_no = len(peaks)
         if ft_pk_no <= 0:
             return [0,0,0,0,0,0,0]
@@ -120,16 +121,17 @@ def inerpeakinfo(window):
     for column in window.T:
         inerpeakinfo.append(inersensorpeakinfo(column))
     return inerpeakinfo
-"General features"
+
 def sensorgeneral (window):
     std = []
     ave = []
     mid = []
     maximum = []
     for columns in window.T:
-        y = list(filter(lambda a: a != 0.0, columns)) #Ramove zeros while calculating features
+        y = list(filter(lambda a: a != 0.0, columns)) #Ramove zeros 
         if len(y) == 0:
             y = [0]
+#        y = columns
         ave.append(np.mean(y))
         std.append(np.std(y))  
         mid.append(np.median(y))  
@@ -141,10 +143,9 @@ def anterposterNAKDR(window,availableSensors):
     avL = availableSensors[[i in [0,2,3,4] for i in availableSensors]]
     avR = availableSensors[[i in [7,9,10,11] for i in availableSensors]]
     if (avL.size == 0 or not 6 in availableSensors) and (avR.size ==0 or not 13 in availableSensors):
-        #Situation that featrues cannot be computed because available sensors are not enough to find anterior-posterior relation
         return ()
     if (avL.size > 0 and 6 in availableSensors):
-        anterL = window[:,avL].max(axis=1)  
+        anterL = window[:,avL].max(axis=1) 
         posterL = window[:,6]
         diffl = np.mean(anterL)-np.mean(posterL)
         correlationL = np.corrcoef(anterL,posterL)[0][1]
@@ -169,7 +170,6 @@ def lattomidNAKDR(window,availableSensors):
     avL = availableSensors[[i in [4,5] for i in availableSensors]]
     avR = availableSensors[[i in [11,12] for i in availableSensors]]
     if (avL.size == 0 or not 2 in availableSensors) and (avR.size ==0 or not 9 in availableSensors):
-        #Situation that featrues cannot be computed because available sensors are not enough to find lateral-medial foot relation
         return ()
     if (avL.size > 0 and 2 in availableSensors):
         latteriorL = window[:,avL].max(axis=1)  
@@ -191,12 +191,11 @@ def lattomidNAKDR(window,availableSensors):
     
     avediff = (diffl+diffr)/2 if diffl > 0 else diffr
     return (avediff,correlationL,correlationR)
-
-"Double floating rate" 
-def overlappingrate (window, availableSensors, threshold = 5):
+    
+def overlappingrate (window, availableSensors, threshold = 5): 
     copyWin = window.copy()
     copyWin[copyWin<threshold] = 0 
-    count = 0 
+    count = 0
     avL = availableSensors[[i in list(range(7)) for i in availableSensors]]
     avR = availableSensors[[i in list(range(7,14)) for i in availableSensors]]
     for each in copyWin:
@@ -204,21 +203,30 @@ def overlappingrate (window, availableSensors, threshold = 5):
             count += 1
     return count/len(window)
 
-"FFT features"
+def fft(window):
+    t = window.sum(axis = 1)
+    fft_abs_amp = np.abs(np.fft.fft(t))*2/len(t)
+    freq_spectrum = fft_abs_amp[1:int(np.floor(len(t) * 1.0 / 2)) + 1]
+    skewness = scipy.stats.skew(freq_spectrum[0:150])
+#    entropy = scipy.stats.entropy(freq_spectrum)
+    s=0
+    for i in range(25,int(np.floor(len(t) * 1.0 / 2))):
+        s+=i*freq_spectrum[i]
+    return (np.mean(freq_spectrum[30:150]),np.std(freq_spectrum[30:150]), (s/np.sum(freq_spectrum))/15, np.sum(freq_spectrum ** 2) / len(freq_spectrum), skewness) 
+
 def fft_RE(window,availableSensors):
     t = window[:,availableSensors].sum(axis = 1)
     TENhz = int(10*len(t)/100)#Identify 10Hz index for all window size
     TWOhz = int(2*len(t)/100)    #Identify 2Hz index for all window size
     ONESIXSEVENhz = int(5/3*len(t)/100)    #Identify 1.67Hz index for all window size
     fft_abs_amp = np.abs(np.fft.fft(t))*2/len(t)    #Calculate the amptitude
-    freq_spectrum = fft_abs_amp[1:int(np.floor(len(t) * 1.0 / 2)) + 1]    #Only half of the data is meaningful for our case we can only get the spectum up to 50Hz
+    freq_spectrum = fft_abs_amp[1:int(np.floor(len(t) * 1.0 / 2)) + 1]    
     skewness = scipy.stats.skew(freq_spectrum[0:TENhz])    #skewness from 0-10Hz
     s=0
     for i in range(ONESIXSEVENhz,len(freq_spectrum)):    # This is the step to modify the range of frequency of MeanFrequency. int(5/3*len(t)/100) means 1.67Hz
         s+=i*freq_spectrum[i]
-
-    MeanFreq = (s/np.sum(freq_spectrum[ONESIXSEVENhz:len(freq_spectrum)])/(len(t)/100))  #weighted mean frequency  
-    power = np.sum(freq_spectrum ** 2)/len(freq_spectrum)#Power density.
+    MeanFreq = (s/np.sum(freq_spectrum[ONESIXSEVENhz:len(freq_spectrum)])/(len(t)/100))   
+    power = np.sum(freq_spectrum ** 2)/len(freq_spectrum)
     return (np.mean(freq_spectrum[TWOhz:TENhz]),np.std(freq_spectrum[TWOhz:TENhz]), MeanFreq, power, skewness)
 
 '''Functions to read files'''
@@ -249,6 +257,7 @@ def filtdata(calibdata_list, order_filter=2, critical_frequency=0.2):
             filtdata_list[i][:,j]= sig.filtfilt(b,a,caliarray[:,j])
 
     for i in range(len(filtdata_list)):
+        # remove the negative value
         filtdata_list[i][filtdata_list[i]<0] = 0
  
         
@@ -257,6 +266,7 @@ def filtdata(calibdata_list, order_filter=2, critical_frequency=0.2):
 '''Window cutting'''
 def cutWindow(data, wl, step):
 
+#    data_list_reshaped = []
     data_window_lists = []
 
     j = 0
@@ -268,31 +278,31 @@ def cutWindow(data, wl, step):
     
     return data_window_lists
 
-'''Hardcoded list of features'''
+'''Hardcoded list of features; should be moved to a config file'''
 def init_feature_names():
-    columnNames = ['mean of pressures left central forefoot', 'mean of pressures left central midfoot','mean of pressures left medial forefoot', 'mean of pressures left big toe','mean of pressures left lateral forefoot', 'mean of pressures left lateral midfoot','mean of pressures left heel',
-                                               'mean of pressures right central forefoot', 'mean of pressures right central midfoot','mean of pressures right medial forefoot', 'mean of pressures right big toe','mean of pressures right lateral forefoot', 'mean of pressures right lateral midfoot','mean of pressures right heel',
-                                               'SD of pressures left central forefoot', 'SD of pressures left central midfoot','SD of pressures left medial forefoot', 'SD of pressures left big toe','SD of pressures left lateral forefoot', 'SD of pressures left lateral midfoot','SD of pressures left heel',
-                                               'SD of pressures right central forefoot', 'SD of pressures right central midfoot','SD of pressures right medial forefoot', 'SD of pressures right big toe','SD of pressures right lateral forefoot', 'SD of pressures right lateral midfoot','SD of pressures right heel',
-                                               'median of pressures left central forefoot', 'median of pressures left central midfoot','median of pressures left medial forefoot', 'median of pressures left big toe','median of pressures left lateral forefoot', 'median of pressures left lateral midfoot','median of pressures left heel',
-                                               'median of pressures right central forefoot', 'median of pressures right central midfoot','median of pressures right medial forefoot', 'median of pressures right big toe','median of pressures right lateral forefoot', 'median of pressures right lateral midfoot','median of pressures right heel',
-                                               'maximal pressures left central forefoot', 'maximal pressures left central midfoot','maximal pressures left medial forefoot', 'maximal pressures left big toe','maximal pressures left lateral forefoot', 'maximal pressures left lateral midfoot','maximal pressures left heel',
-                                               'maximal pressures right central forefoot', 'maximal pressures right central midfoot','maximal pressures right medial forefoot', 'maximal pressures right big toe','maximal pressures right lateral forefoot', 'maximal pressures right lateral midfoot','maximal pressures right heel',
-                                       'number of peaks left central forefoot','average peak interval left central forefoot','SD of peak interval left central forefoot','average peak magnitude left central forefoot','SD of peak magnitude left central forefoot','average peak width left central forefoot','SD of peak width left central forefoot',
-                                       'number of peaks left central midfoot','average peak interval left central midfoot','SD of peak interval left central midfoot','average peak magnitude left central midfoot','SD of peak magnitude left central midfoot','average peak width left central midfoot','SD of peak width left central midfoot',
-                                       'number of peaks left medial forefoot','average peak interval left medial forefoot','SD of peak interval left medial forefoot','average peak magnitude left medial forefoot','SD of peak magnitude left medial forefoot','average peak width left medial forefoot','SD of peak width left medial forefoot',
-                                       'number of peaks left big toe','average peak interval left big toe','SD of peak interval left big toe','average peak magnitude left big toe','SD of peak magnitude left big toe','average peak width left big toe','SD of peak width left big toe',
-                                       'number of peaks left lateral forefoot','average peak interval left lateral forefoot','SD of peak interval left lateral forefoot','average peak magnitude left lateral forefoot','SD of peak magnitude left lateral forefoot','average peak width left lateral forefoot','SD of peak width left lateral forefoot',
-                                       'number of peaks left lateral midfoot','average peak interval left lateral midfoot','SD of peak interval left lateral midfoot','average peak magnitude left lateral midfoot','SD of peak magnitude left lateral midfoot','average peak width left lateral midfoot','SD of peak width left lateral midfoot',
-                                       'number of peaks left heel','average peak interval left heel','SD of peak interval left heel','average peak magnitude left heel','SD of peak magnitude left heel','average peak width left heel','SD of peak width left heel',
-                                       'number of peaks right central forefoot','average peak interval right central forefoot','SD of peak interval right central forefoot','average peak magnitude right central forefoot','SD of peak magnitude right central forefoot','average peak width right central forefoot','SD of peak width right central forefoot',
-                                       'number of peaks right central midfoot','average peak interval right central midfoot','SD of peak interval right central midfoot','average peak magnitude right central midfoot','SD of peak magnitude right central midfoot','average peak width right central midfoot','SD of peak width right central midfoot',
-                                       'number of peaks right medial forefoot','average peak interval right medial forefoot','SD of peak interval right medial forefoot','average peak magnitude right medial forefoot','SD of peak magnitude right medial forefoot','average peak width right medial forefoot','SD of peak width right medial forefoot',
-                                       'number of peaks right big toe','average peak interval right big toe','SD of peak interval right big toe','average peak magnitude right big toe','SD of peak magnitude right big toe','average peak width right big toe','SD of peak width right big toe',
-                                       'number of peaks right lateral forefoot','average peak interval right lateral forefoot','SD of peak interval right lateral forefoot','average peak magnitude right lateral forefoot','SD of peak magnitude right lateral forefoot','average peak width right lateral forefoot','SD of peak width right lateral forefoot',
-                                       'number of peaks right lateral midfoot','average peak interval right lateral midfoot','SD of peak interval right lateral midfoot','average peak magnitude right lateral midfoot','SD of peak magnitude right lateral midfoot','average peak width right lateral midfoot','SD of peak width right lateral midfoot',
-                                       'number of peaks right heel','average peak interval right heel','SD of peak interval right heel','average peak magnitude right heel','SD of peak magnitude right heel','average peak width right heel','SD of peak width right heel']
-    to_recomp = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot','median-lateral mean difference','median-lateral correlation coefficient left foot','median-lateral correlation coefficient right foot','mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness','double float phase duration','pressure difference between foot landing and lifting']
+    columnNames = ['aveL7', 'aveL6','aveL5', 'aveL4','aveL3', 'aveL2','aveL1',
+                                               'aveR7', 'aveR6','aveR5', 'aveR4','aveR3', 'aveR2','aveR1',
+                                               'stdL7', 'stdL6','stdL5', 'stdL4','stdL3', 'stdL2','stdL1',
+                                               'stdR7', 'stdR6','stdR5', 'stdR4','stdR3', 'stdR2','stdR1',
+                                               'midL7', 'midL6','midL5', 'midL4','midL3', 'midL2','midL1',
+                                               'midR7', 'midR6','midR5', 'midR4','midR3', 'midR2','midR1',
+                                               'maxL7', 'maxL6','maxL5', 'maxL4','maxL3', 'maxL2','maxL1',
+                                               'maxR7', 'maxR6','maxR5', 'maxR4','maxR3', 'maxR2','maxR1',
+                                       'peaknumL7','peakdisaveL7','peakdisstdL7','peakmgaveL7','peakmgstdL7','peakwthaveL7','peakwthstdL7',
+                                       'peaknumL6','peakdisaveL6','peakdisstdL6','peakmgaveL6','peakmgstdL6','peakwthaveL6','peakwthstdL6',
+                                       'peaknumL5','peakdisaveL5','peakdisstdL5','peakmgaveL5','peakmgstdL5','peakwthaveL5','peakwthstdL5',
+                                       'peaknumL4','peakdisaveL4','peakdisstdL4','peakmgaveL4','peakmgstdL4','peakwthaveL4','peakwthstdL4',
+                                       'peaknumL3','peakdisaveL3','peakdisstdL3','peakmgaveL3','peakmgstdL3','peakwthaveL3','peakwthstdL3',
+                                       'peaknumL2','peakdisaveL2','peakdisstdL2','peakmgaveL2','peakmgstdL2','peakwthaveL2','peakwthstdL2',
+                                       'peaknumL1','peakdisaveL1','peakdisstdL1','peakmgaveL1','peakmgstdL1','peakwthaveL1','peakwthstdL1',
+                                       'peaknumR7','peakdisaveR7','peakdisstdR7','peakmgaveR7','peakmgstdR7','peakwthaveR7','peakwthstdR7',
+                                       'peaknumR6','peakdisaveR6','peakdisstdR6','peakmgaveR6','peakmgstdR6','peakwthaveR6','peakwthstdR6',
+                                       'peaknumR5','peakdisaveR5','peakdisstdR5','peakmgaveR5','peakmgstdR5','peakwthaveR5','peakwthstdR5',
+                                       'peaknumR4','peakdisaveR4','peakdisstdR4','peakmgaveR4','peakmgstdR4','peakwthaveR4','peakwthstdR4',
+                                       'peaknumR3','peakdisaveR3','peakdisstdR3','peakmgaveR3','peakmgstdR3','peakwthaveR3','peakwthstdR3',
+                                       'peaknumR2','peakdisaveR2','peakdisstdR2','peakmgaveR2','peakmgstdR2','peakwthaveR2','peakwthstdR2',
+                                       'peaknumR1','peakdisaveR1','peakdisstdR1','peakmgaveR1','peakmgstdR1','peakwthaveR1','peakwthstdR1']
+    to_recomp = ['APdiff','APcoraL','APcoraR','LMdiff','LMcoraL','LMcoraR','fftmean','fftstd','fftweight','fftennergy','fftskewness','overlap','inerstepinterval']
     return columnNames,to_recomp
 
 '''Make a feature list'''
@@ -316,7 +326,6 @@ def comp_base_features(windowtotal):
    
     return feature_all
 
-"Calculate Anterior-posterior, lateral-medial foot relation features and fft features while using different sensor configurations"
 def recomp(windowtotal,availableSensors,availableFeatureNames):
     df_featureplus = pd.DataFrame()
     if 'APdiff' not in availableFeatureNames:
@@ -328,7 +337,7 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
                 featureforone.append(i)
             featuretotAP.append(featureforone)
         if len(featureforone)!= 0:
-            df_AP = pd.DataFrame(featuretotAP,columns = ['anterior-posterior mean difference','anterior-posterior correlation coefficient left foot','anterior-posterior correlation coefficient right foot'])
+            df_AP = pd.DataFrame(featuretotAP,columns = ['APdiff','APcoraL','APcoraR'])
             df_featureplus = pd.concat([df_featureplus, df_AP], axis=1, sort=False)
         
     if 'LMdiff' not in availableFeatureNames:    
@@ -340,7 +349,7 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
                 featureforone.append(i)
             featuretotLM.append(featureforone)
         if len(featureforone)!= 0:
-            df_LM = pd.DataFrame(featuretotLM,columns = ['median-lateral mean difference','median-lateral correlation coefficient left foot','median-lateral correlation coefficient right foot'])
+            df_LM = pd.DataFrame(featuretotLM,columns = ['LMdiff','LMcoraL','LMcoraR'])
             df_featureplus = pd.concat([df_featureplus,df_LM], axis=1, sort=False)        
         
     featuretotFFT = []    
@@ -350,13 +359,13 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
         for i in temp:
             featureforone.append(i)
         featuretotFFT.append(featureforone)
-    df_FFT = pd.DataFrame(featuretotFFT,columns = ['mean of AC component FFT','SD of AC component FFT','weighted frequency average','FFT energy','FFT skewness'])
+    df_FFT = pd.DataFrame(featuretotFFT,columns = ['fftmean','fftstd','fftweight','fftennergy','fftskewness'])
     df_featureplus = pd.concat([df_featureplus,df_FFT], axis=1, sort=False)
 
     featuregatephase = []
     for window in windowtotal:
         featuregatephase.append([overlappingrate(window,availableSensors),instepfeature(window,availableSensors)])
-    df_gatephase = pd.DataFrame(featuregatephase,columns=['double float phase duration','pressure difference between foot landing and lifting'])
+    df_gatephase = pd.DataFrame(featuregatephase,columns=['overlap','inerstepinterval'])
     df_featureplus = pd.concat([df_featureplus,df_gatephase], axis = 1, sort=False)
         
     return df_featureplus
@@ -364,7 +373,7 @@ def recomp(windowtotal,availableSensors,availableFeatureNames):
 '''Get list of available features'''
 def get_available_features(availableSensors, columnNames, nSensors = 14, totsinglesensordep = 4, totsinglesensorcol = 7):
     '''
-    colomns in raw data is reversed
+    !!NOTICE!!
     when input the intrest configurations follow this:
     L1 -- 6       R1 -- 13
     L2 -- 5       R2 -- 12
@@ -380,7 +389,6 @@ def get_available_features(availableSensors, columnNames, nSensors = 14, totsing
         requirements += [[i] for i in range(nSensors)]
     for i in range(nSensors):
         requirements += [[i] for _ in range(totsinglesensorcol)]
-    #all other features must be recalculated
     
     availableFeatureNames =[]
     for i in range(len(requirements)):
@@ -402,7 +410,7 @@ def base_train_evaluate(dfsample, training_subjects_assignments,nRepeats = 100, 
     
     for training_subject in training_subjects_assigments:
         
-        X_train = np.array([], dtype=np.int64).reshape(0,n_ft-2) #An empty array shaped according to feature numbers, will be filled in with training sample feature vector
+        X_train = np.array([], dtype=np.int64).reshape(0,n_ft-2) 
         X_test = X_train.copy() #Empty, same size, for test sample feature vector
         y_train = [] #To fill with training labels
         y_test = [] #To fill with test labels
@@ -417,7 +425,7 @@ def base_train_evaluate(dfsample, training_subjects_assignments,nRepeats = 100, 
         y_train = np.concatenate((y_train, trn.iloc[:,-1].values), axis=0)
         y_test = np.concatenate((y_test, tst.iloc[:,-1].values), axis=0)
       
-        repeats = nRepeats #It is how many time fitting repeats
+        repeats = nRepeats 
         seed = 0
         
         featureimportance = np.zeros(len(dfsample.keys())-2)
@@ -425,7 +433,7 @@ def base_train_evaluate(dfsample, training_subjects_assignments,nRepeats = 100, 
         for index in range(repeats):
             seed += interval
             rf = RandomForestClassifier(n_estimators=nTrees, random_state=seed, verbose=0,
-                                        min_samples_split=2, class_weight="balanced", n_jobs = 1)  
+                                        min_samples_split=2, class_weight="balanced", n_jobs = 1)    
             rf.fit(X_train, y_train)
         
             featureimportance += rf.feature_importances_
@@ -450,12 +458,12 @@ def setup_evaluation(path,windowLength = 1500):
     #Cut windows
     windowtotal = []    
     df_label = pd.DataFrame()
- 
+    
     for i in range(len(filt_list)): 
         temp = cutWindow(filt_list[i],windowLength,int(windowLength/2))
         for t in temp:
             windowtotal.append(t)
-            df_label = pd.concat([df_label,files[i][:1][['Subject','Activity']]],ignore_index = True) #all the content of the file should be the same subject/activity combo
+            df_label = pd.concat([df_label,files[i][:1][['Subject','Activity']]],ignore_index = True) 
 
 
     print(df_label)
@@ -469,7 +477,7 @@ def setup_evaluation(path,windowLength = 1500):
     return windowtotal, df_feature, df_label
 
 def remove_features(df_sample, featureimportance, differencePerRun = 20):
-
+    
     #differencePerRun: number of features removed per run
     lfeatureimportance = featureimportance.tolist()
         
@@ -488,9 +496,11 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
 ##    This function prints and plots the confusion matrix.
 ##    Normalization can be applied by setting `normalize=True`.
+    #sns.set(rc={'figure.figsize':(11.7,8.27)})
     font = {'weight':'normal', 'size': 18,}
     
-
+  
+    ## Adapted from the original code of sklearn and Dian
     fig, ax = plt.subplots()
     fig.set_size_inches(8, 8)
     if not title:
@@ -511,7 +521,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
     #print(cm)
     
-     #show all ticks.
+    
     ax.set(xticks=np.arange(cm.shape[1]),
            yticks=np.arange(cm.shape[0]),
            xticklabels=classes, yticklabels=classes)
@@ -553,8 +563,9 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
     #print(available_features)                                                                                                                                                                              
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)                                                                                                                                                                                         
-    sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)                                            
-    sample = sample.fillna(0)                                                                                                                   
+    sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)
+    #sample = sample.drop(index = sample[(sample['Activity'] == 'upslop') & (sample['Subject'].isin([8,18])) ].index.tolist())  #This is a mistake in raw data                                              
+    sample = sample.fillna(0)                                 
     totalfeatures = len(sample.columns) - len(df_label.columns)
     scores,preds,reals,featureimportance = base_train_evaluate(sample,training_subjects_assigments, nRepeats = 20, nTrees = nTrees)
     df_score = pd.DataFrame(scores,columns = [totalfeatures])
@@ -573,12 +584,12 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
         cm = confusion_matrix(reals[i], preds[i])
         cmnmlzd.append(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis])
 
-#    print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #Add up predicted activities and true activities in 100 run.
-    meancm = sum(cmnmlzd)/len(cmnmlzd)#Calculate confusion matrix after 100 runs
-#    with sns.axes_style("whitegrid",{'axes.grid': False}):
-#        fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
-#        plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures)+'.pdf',format="pdf")
-#        plt.close()
+    #print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #Dian: this can be considered as average accurate                             
+    meancm = sum(cmnmlzd)/len(cmnmlzd)#average accurate
+    with sns.axes_style("whitegrid",{'axes.grid': False}):
+        fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
+        plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures)+'.pdf',format="pdf")
+        plt.close()
     np.savetxt(output_folder+'overall_true_pred_'+configName+'_'+str(totalfeatures)+'.dat',meancm,delimiter=',')
         #with open('overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat','w') as savefile:                                                                                                
         #    savefile.write(str(overall_true_categories))                                                                                                                                                   
@@ -593,7 +604,8 @@ def full_run(availableSensors,training_subjects_assigments, windowtotal,df_featu
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)
     sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)
-    sample = sample.fillna(0)
+    #sample = sample.drop(index = sample[(sample['Activity'] == 'upslop') & (sample['Subject'].isin([8,18])) ].index.tolist())  #This is a mistake in raw data
+    sample = sample.fillna(0) 
     totalfeatures = len(sample.columns) - len(df_label.columns)
     for nFeatures in range(totalfeatures):
         scores,preds,reals,featureimportance = base_train_evaluate(sample,training_subjects_assigments, nRepeats = 20, nTrees = nTrees)
@@ -615,10 +627,10 @@ def full_run(availableSensors,training_subjects_assigments, windowtotal,df_featu
             
         print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) 
         meancm = sum(cmnmlzd)/len(cmnmlzd)
-#        with sns.axes_style("whitegrid",{'axes.grid': False}):
-#            fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
-#            plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures-nFeatures)+'.pdf',format="pdf")
-#            plt.close()
+        with sns.axes_style("whitegrid",{'axes.grid': False}):
+            fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
+            plt.savefig(fname = output_folder+'heatmap_'+configName+'_'+str(totalfeatures-nFeatures)+'.pdf',format="pdf")
+            plt.close()
         np.savetxt(output_folder+'overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat',meancm,delimiter=',')
         #with open('overall_true_pred_'+configName+'_'+str(totalfeatures-nFeatures)+'.dat','w') as savefile:
         #    savefile.write(str(overall_true_categories))
@@ -632,11 +644,8 @@ if __name__ == '__main__':
 
     output_folder = 'output/'
     nTrees = 100
-    windowLength = [2000] 
-    windowLength_multi = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
+    windowLength = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
     
-
-
     availableThreads = psutil.cpu_count()
 
 
@@ -644,9 +653,10 @@ if __name__ == '__main__':
     if basePath == None:
         print("Error: basePath not set. Please set path.")
         exit()
-    output_folder = sys.argv[2]
-    output_folder_window = sys.argv[3]
-
+    if len(sys.argv) > 2:
+        output_folder = sys.argv[2]
+    if len(sys.argv) > 3:
+        windowLength = [int(sys.argv[3])]
     totalFeatures = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength]
     #windowtotal, df_feature, df_label = setup_evaluation(basePath,windowLength=windowLength)
     featureNames = list(totalFeatures[0][2].columns)
@@ -672,45 +682,35 @@ if __name__ == '__main__':
     
     
     #training_subjects_assigments = [np.random.choice([4,5,7,8,9,10,11,13,15,18,30],6,replace=False) for _ in range(5)]
-    #training_subjects_assigments = [[4,5,7,8,9,10]]
+    
     training_subjects_assigments = [[4,5,7,8,9,10],[7,8,11,13,15,30],[4,7,9,10,15,18],[4,5,11,13,18,30],[7,8,10,15,18,30]]
     print("Training assignments:",training_subjects_assigments)
     with open(output_folder+'assignments.txt','w') as f:
         f.write(str(training_subjects_assigments))
         f.flush()
 
-    for elem in totalFeatures:
+    
 
+    for elem in totalFeatures:
+    
         elem[2].loc[elem[2].Activity == 'walkF','Activity'] = 'walk'
         elem[2].loc[elem[2].Activity == 'walkN','Activity'] = 'walk'
         elem[2].loc[elem[2].Activity == 'jog','Activity'] = 'run'
         elem[2].loc[elem[2].Activity == 'nonlocal','Activity'] = 'housework'
         elem[2].loc[elem[2].Activity == 'sit','Activity'] = 'sitting'
-    
-    labels = ['upstairs', 'downstairs', 'housework', 'run', 'sitting', 'standing', 'upslope', 'cycling','walk'] #Renewed Label list
+        
+        
+
+    labels = ['upstairs', 'downstairs', 'housework', 'run', 'sitting', 'standing', 'upslope', 'cycling','walk'] 
     def temp_run(availableSensors):
         full_run(availableSensors,training_subjects_assigments, totalFeatures[0][0],totalFeatures[0][1],totalFeatures[0][2],output_folder = output_folder,nTrees = nTrees)
     def temp_run_fullfeatures(elem):
-        maxfeature_run(interestConfig[-1],training_subjects_assigments, elem[0],elem[1],elem[2],output_folder = output_folder_window + str(len(elem[0][0]))+"_",nTrees = nTrees)
-    
+        maxfeature_run(interestConfig[-1],training_subjects_assigments, elem[0],elem[1],elem[2],output_folder = output_folder+str(len(elem[0][0]))+"_",nTrees = nTrees)
     with Pool(availableThreads) as pool:
-        pool.map(temp_run,interestConfig)
-    
-    
-    totalFeatures_multi_win = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength_multi]
-    for elem in totalFeatures_multi_win:
-
-        elem[2].loc[elem[2].Activity == 'walkF','Activity'] = 'walk'
-        elem[2].loc[elem[2].Activity == 'walkN','Activity'] = 'walk'
-        elem[2].loc[elem[2].Activity == 'jog','Activity'] = 'run'
-        elem[2].loc[elem[2].Activity == 'nonlocal','Activity'] = 'housework'
-        elem[2].loc[elem[2].Activity == 'sit','Activity'] = 'sitting'
-
-        labels = ['upstairs', 'downstairs', 'housework', 'run', 'sitting', 'standing', 'upslope', 'cycling','walk'] #Renewed Label list
-
-        temp_run_fullfeatures(elem)
-        
-    
-
+        if len(windowLength) > 1:
+            pool.map(temp_run_fullfeatures,totalFeatures)
+        else:
+            pool.map(temp_run,interestConfig)
+        #
 
     print('Strart time',start_time,'end time',time.time())
