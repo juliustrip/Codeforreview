@@ -5,7 +5,7 @@ This repository contains:
 
 
 ## Content of the repository
-* **automatedAnalysis.py** - This program contains a library of functions reading the raw data, extracting features, performing the machine learning treatment (training, evaluation), and storing the results. It automatically manages the feature reduction stepping process and can evaluate multiple sensor configurations, up to the maximum number of threads available.
+* **automatedAnalysis.py** - This program contains a library of functions reading the raw data, extracting features, performing the machine learning treatment (training, evaluation), and storing the results. It automatically manages the feature reduction stepping process and can evaluate multiple sensor configurations, up to the maximum number of threads available. It also automatically manages evaluating performance of multiple window size from 1 second to 60 seconds with full sensor configuration full available features.
 * **FigurePanels.ipynb** - This Jupyter notebook contains functions and pieces of code for generating the figure panels showed in the manuscript. The output of **automatedAnalysis.py** are used as inputs. The generation of fig.9B panels used a different set of inputs, also provided in the data repository.
 
 ## Prerequisites
@@ -21,11 +21,13 @@ Packages: Numpy, Pandas, Scipy, Sklearn, pickle, import heapq, time, seaborn, mu
 * Prepare two folders:
 1) /DIR/window_length_results/ for storing the results of the "window length" analysis
 2) /DIR/config_feat_results/ for storing the results of the "sensor configuration and feature number reduction" analysis.
-* Run the code in the terminal from the directory of **automatedAnalysis.py** 
-
-Example for Linux users.
+* Run the code in the terminal from the directory of **automatedAnalysis.py** with following comment to get results of the "window length" analysis.(Example for Linux users.)
 ```bash
-python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ /DIR/window_length_results/ 
+python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/window_length_results/ 
+```
+* Run the code in the terminal from the directory of **automatedAnalysis.py** with following comment to get results of the "sensor configuration and feature number reduction" analysis when using 20 seconds of window size.(Example for Linux users.)
+```bash
+python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 2000
 ```
 * You can run **FigurePanels.ipynb** in jupyter notebook to generate figure panels.
 Note: Single forest results are not stored by **automatedAnalysis.py** in main analysis. For the sake of examples shown in Figure 11, detailed single forest performance statistics have been generated separetely. These results are available in the data repository ("one_config").
