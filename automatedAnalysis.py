@@ -661,8 +661,8 @@ if __name__ == '__main__':
     #windowtotal, df_feature, df_label = setup_evaluation(basePath,windowLength=windowLength)
     featureNames = list(totalFeatures[0][2].columns)
 
-    interestConfig =  [np.array([i]) for i in range(14)] #all single sensors
-    interestConfig += [np.array([i,i+7]) for i in range(7)] #all single sensors (pairs)
+
+    interestConfig = [np.array([i,i+7]) for i in range(7)] #all single sensors (pairs)
     interestConfig += [np.array([6,6-i,13,13-i]) for i in range(1,6)] #all pair of sensors including the heel
     interestConfig += [np.array([2,4,9,11]),np.array([0,2,7,9]),np.array([0,4,7,11]),np.array([0,3,7,10])] #horizontal pairs
     interestConfig += [np.array([0,1,7,8]),np.array([0,5,7,12]),np.array([0,6,7,13])]
