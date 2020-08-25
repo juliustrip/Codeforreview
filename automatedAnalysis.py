@@ -563,8 +563,7 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
     #print(available_features)                                                                                                                                                                              
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)                                                                                                                                                                                         
-    sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)
-    #sample = sample.drop(index = sample[(sample['Activity'] == 'upslop') & (sample['Subject'].isin([8,18])) ].index.tolist())  #This is a mistake in raw data                                              
+    sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)                                           
     sample = sample.fillna(0)                                 
     totalfeatures = len(sample.columns) - len(df_label.columns)
     scores,preds,reals,featureimportance = base_train_evaluate(sample,training_subjects_assigments, nRepeats = 20, nTrees = nTrees)
@@ -584,7 +583,7 @@ def maxfeature_run(availableSensors,training_subjects_assigments, windowtotal,df
         cm = confusion_matrix(reals[i], preds[i])
         cmnmlzd.append(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis])
 
-    #print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #Dian: this can be considered as average accurate                             
+    #print(availableSensors,(totalfeatures-nFeatures),"acc:",accuracy_score(overall_true_categories, overall_predictions)) #average accurate                             
     meancm = sum(cmnmlzd)/len(cmnmlzd)#average accurate
     with sns.axes_style("whitegrid",{'axes.grid': False}):
         fig = plot_confusion_matrix(overall_true_categories,overall_predictions,classes=['upstairs', 'downstairs', 'housework', 'run', 'sit', 'stand', 'walk', 'upslope', 'cycling','walk'], normalize=True,title='Normalized confusion matrix')
@@ -604,7 +603,6 @@ def full_run(availableSensors,training_subjects_assigments, windowtotal,df_featu
     df_temp = recomp(windowtotal,availableSensors,available_features)
     #print(df_temp)
     sample = pd.concat([df_feature[available_features], df_temp, df_label], axis=1, sort=False)
-    #sample = sample.drop(index = sample[(sample['Activity'] == 'upslop') & (sample['Subject'].isin([8,18])) ].index.tolist())  #This is a mistake in raw data
     sample = sample.fillna(0) 
     totalfeatures = len(sample.columns) - len(df_label.columns)
     for nFeatures in range(totalfeatures):
