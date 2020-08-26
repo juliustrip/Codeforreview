@@ -644,22 +644,6 @@ if __name__ == '__main__':
     nTrees = 100
     windowLength = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
     
-    availableThreads = psutil.cpu_count()
-
-
-    basePath = sys.argv[1] if len(sys.argv) > 1 else None
-    if basePath == None:
-        print("Error: basePath not set. Please set path.")
-        exit()
-    if len(sys.argv) > 2:
-        output_folder = sys.argv[2]
-    if len(sys.argv) > 3:
-        windowLength = [int(sys.argv[3])]
-    totalFeatures = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength]
-    #windowtotal, df_feature, df_label = setup_evaluation(basePath,windowLength=windowLength)
-    featureNames = list(totalFeatures[0][2].columns)
-
-
     interestConfig = [np.array([i,i+7]) for i in range(7)] #all single sensors (pairs)
     interestConfig += [np.array([6,6-i,13,13-i]) for i in range(1,6)] #all pair of sensors including the heel
     interestConfig += [np.array([2,4,9,11]),np.array([0,2,7,9]),np.array([0,4,7,11]),np.array([0,3,7,10])] #horizontal pairs
@@ -676,8 +660,55 @@ if __name__ == '__main__':
     interestConfig += [np.delete(np.array([i for i in range(14)]),[j,j+7]) for j in range(7)]
     interestConfig += [np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13])] # sensors
     #interestConfig = [np.array([0,6,7,13]),np.array([0,1,3,6,7,8,10,13])]
-    print("Tried configurations:", interestConfig)
     
+    def changeConfigsto127():
+        from itertools import combinations 
+        interestConfig127 = []
+        for combi in [combinations([0, 1, 2, 3, 4, 5, 6], i) for i in range(1,8)]:
+            for Config in combi:
+                interestConfig127 += [np.concatenate((np.array(Config),np.array(Config)+7),axis=None)]   
+        return interestConfig127
+    
+    def changeConfigsto25():
+        interestConfig25 = [np.array([6,13]), np.array([0,7]), np.array([4,6,11,13]), np.array([0,6,7,13]), np.array([2,4,9,11]), np.array([0,3,7,10]),
+                            np.array([0,4,6,7,11,13]), np.array([0,5,6,7,12,13]), np.array([2,3,4,9,10,11]), np.array([0,1,3,7,8,10]),
+                            np.array([3,4,5,6,10,11,12,13]), np.array([0,4,5,6,7,11,12,13]), np.array([2,3,4,6,9,10,11,13]), np.array([1,2,3,4,8,9,10,11]),
+                            np.array([0,1,4,5,6,7,8,11,12,13]), np.array([0,2,3,4,6,7,9,10,11,13]), np.array([0,2,4,5,6,7,9,11,12,13]), np.array([2,3,4,5,6,9,10,11,12,13]),
+                            np.array([0,1,2,3,4,7,8,9,10,11]), np.array([0,2,3,4,5,7,9,10,11,12]),
+                            np.array([0,1,3,4,5,6,7,8,10,11,12,13]), np.array([0,2,3,4,5,6,7,9,10,11,12,13]), np.array([0,1,2,4,5,6,7,8,9,11,12,13]), np.array([0,1,2,3,4,5,7,8,9,10,11,12]),
+                            np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13])]
+        return interestConfig25
+        
+    
+    availableThreads = psutil.cpu_count()
+
+
+    basePath = sys.argv[1] if len(sys.argv) > 1 else None
+    if basePath == None:
+        print("Error: basePath not set. Please set path.")
+        exit()
+    if len(sys.argv) > 2:
+        output_folder = sys.argv[2]
+    if len(sys.argv) > 3:
+        windowLength = [int(sys.argv[3])]
+    if len(sys.argv) > 4:
+        if int(sys.argv[4]) == 127:
+            interestConfig = changeConfigsto127()
+        elif int(sys.argv[4]) == 25:
+            interestConfig = changeConfigsto25()
+        else:
+            print("Configuration number is not available, please input 127 for result of all sensor configurations or 25 for configurations in the paper")
+            exit()
+    
+    totalFeatures = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength]
+    #windowtotal, df_feature, df_label = setup_evaluation(basePath,windowLength=windowLength)
+    featureNames = list(totalFeatures[0][2].columns)
+    
+    
+    print("Tried windowsize:", windowLength)
+    
+    print("Tried configurations:", interestConfig)
+    print("Configuration number:", len(interestConfig))
     
     #training_subjects_assigments = [np.random.choice([4,5,7,8,9,10,11,13,15,18,30],6,replace=False) for _ in range(5)]
     
