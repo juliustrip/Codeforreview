@@ -644,22 +644,23 @@ if __name__ == '__main__':
     nTrees = 100
     windowLength = [100,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000]
     
-    interestConfig = [np.array([i,i+7]) for i in range(7)] #all single sensors (pairs)
-    interestConfig += [np.array([6,6-i,13,13-i]) for i in range(1,6)] #all pair of sensors including the heel
-    interestConfig += [np.array([2,4,9,11]),np.array([0,2,7,9]),np.array([0,4,7,11]),np.array([0,3,7,10])] #horizontal pairs
-    interestConfig += [np.array([0,1,7,8]),np.array([0,5,7,12]),np.array([0,6,7,13])]
-    interestConfig += [np.array([0,2,6,7,9,13]),np.array([0,4,6,7,11,13]),np.array([2,4,6,9,11,13]),np.array([2,3,4,9,10,11])] # 3 sensors
-    interestConfig += [np.array([0,1,6,7,8,13]),np.array([0,1,3,7,8,10]),np.array([0,5,6,7,12,13]),np.array([0,1,2,7,8,9])] # 3 sensors
-    interestConfig += [np.array([0,4,5,7,11,12]),np.array([2,4,5,9,11,12]),np.array([0,2,5,7,9,12]),np.array([1,5,6,8,12,13]), np.array([0,1,5,7,8,12])] # 3 sensors
-    interestConfig += [np.array([2,3,4,6,9,10,11,13]),np.array([0,2,3,6,7,9,10,13]),np.array([0,3,4,6,7,10,11,13]),np.array([0,2,4,6,7,9,11,13]),np.array([0,1,3,6,7,8,10,13])] # 4 sensors
-    interestConfig += [np.array([0,1,2,3,7,8,9,10]),np.array([0,1,3,4,7,8,10,11]),np.array([1,2,3,4,8,9,10,11]),np.array([2,3,4,5,9,10,11,12])] # 4 sensors
-    interestConfig += [np.array([0,2,3,5,7,9,10,12]),np.array([0,3,4,5,7,10,11,12]),np.array([0,2,4,5,7,9,11,12]),np.array([0,1,5,6,7,8,12,13])] # 4 sensors
-    interestConfig += [np.array([1,2,5,6,8,9,12,13]),np.array([1,4,5,6,8,11,12,13]),np.array([3,4,5,6,10,11,12,13]),np.array([0,4,5,6,7,11,12,13]), np.array([1,2,3,6,8,9,10,13])] # 4 sensors
-    interestConfig += [np.array([0,2,3,4,6,7,9,10,11,13]),np.array([0,2,4,5,6,7,9,11,12,13]),np.array([0,1,4,5,6,7,8,11,12,13]),np.array([0,1,2,5,6,7,8,9,12,13])] # 5 sensors
-    interestConfig += [np.array([1,3,4,5,6,8,10,11,12,13]),np.array([2,3,4,5,6,9,10,11,12,13]),np.array([0,2,3,4,5,7,9,10,11,12]),np.array([1,2,3,4,5,8,9,10,11,12]),np.array([0,1,2,3,4,7,8,9,10,11])] # 5 sensors
-    interestConfig += [np.delete(np.array([i for i in range(14)]),[j,j+7]) for j in range(7)]
-    interestConfig += [np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13])] # sensors
-    #interestConfig = [np.array([0,6,7,13]),np.array([0,1,3,6,7,8,10,13])]
+    interestConfig67 = [np.array([i,i+7]) for i in range(7)] #all single sensors (pairs)
+    interestConfig67 += [np.array([6,6-i,13,13-i]) for i in range(1,6)] #all pair of sensors including the heel
+    interestConfig67 += [np.array([2,4,9,11]),np.array([0,2,7,9]),np.array([0,4,7,11]),np.array([0,3,7,10])] #horizontal pairs
+    interestConfig67 += [np.array([0,1,7,8]),np.array([0,5,7,12]),np.array([0,6,7,13])]
+    interestConfig67 += [np.array([0,2,6,7,9,13]),np.array([0,4,6,7,11,13]),np.array([2,4,6,9,11,13]),np.array([2,3,4,9,10,11])] # 3 sensors
+    interestConfig67 += [np.array([0,1,6,7,8,13]),np.array([0,1,3,7,8,10]),np.array([0,5,6,7,12,13]),np.array([0,1,2,7,8,9])] # 3 sensors
+    interestConfig67 += [np.array([0,4,5,7,11,12]),np.array([2,4,5,9,11,12]),np.array([0,2,5,7,9,12]),np.array([1,5,6,8,12,13]), np.array([0,1,5,7,8,12])] # 3 sensors
+    interestConfig67 += [np.array([2,3,4,6,9,10,11,13]),np.array([0,2,3,6,7,9,10,13]),np.array([0,3,4,6,7,10,11,13]),np.array([0,2,4,6,7,9,11,13]),np.array([0,1,3,6,7,8,10,13])] # 4 sensors
+    interestConfig67 += [np.array([0,1,2,3,7,8,9,10]),np.array([0,1,3,4,7,8,10,11]),np.array([1,2,3,4,8,9,10,11]),np.array([2,3,4,5,9,10,11,12])] # 4 sensors
+    interestConfig67 += [np.array([0,2,3,5,7,9,10,12]),np.array([0,3,4,5,7,10,11,12]),np.array([0,2,4,5,7,9,11,12]),np.array([0,1,5,6,7,8,12,13])] # 4 sensors
+    interestConfig67 += [np.array([1,2,5,6,8,9,12,13]),np.array([1,4,5,6,8,11,12,13]),np.array([3,4,5,6,10,11,12,13]),np.array([0,4,5,6,7,11,12,13]), np.array([1,2,3,6,8,9,10,13])] # 4 sensors
+    interestConfig67 += [np.array([0,2,3,4,6,7,9,10,11,13]),np.array([0,2,4,5,6,7,9,11,12,13]),np.array([0,1,4,5,6,7,8,11,12,13]),np.array([0,1,2,5,6,7,8,9,12,13])] # 5 sensors
+    interestConfig67 += [np.array([1,3,4,5,6,8,10,11,12,13]),np.array([2,3,4,5,6,9,10,11,12,13]),np.array([0,2,3,4,5,7,9,10,11,12]),np.array([1,2,3,4,5,8,9,10,11,12]),np.array([0,1,2,3,4,7,8,9,10,11])] # 5 sensors
+    interestConfig67 += [np.delete(np.array([i for i in range(14)]),[j,j+7]) for j in range(7)]
+    interestConfig67 += [np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13])] # sensors    
+    
+    interestConfig = interestConfig67
     
     def changeConfigsto127():
         from itertools import combinations 
@@ -694,10 +695,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 4:
         if int(sys.argv[4]) == 127:
             interestConfig = changeConfigsto127()
+        elif int(sys.argv[4]) == 67:
+            pass
         elif int(sys.argv[4]) == 25:
             interestConfig = changeConfigsto25()
         else:
-            print("Configuration number is not available, please input 127 for result of all sensor configurations or 25 for configurations in the paper")
+            print("Error: Configuration number is not available, please replace Configuration_number with 127 for result of all sensor configurations or 67 for original analysing results or 25 for configurations in the paper")
             exit()
     
     totalFeatures = [setup_evaluation(basePath,windowLength=winLength) for winLength in windowLength]
