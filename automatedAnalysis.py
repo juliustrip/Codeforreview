@@ -710,8 +710,8 @@ if __name__ == '__main__':
     
     print("Tried windowsize:", windowLength)
     
-    print("Tried configurations:", interestConfig)
-    print("Configuration number:", len(interestConfig))
+    #print("Tried configurations:", interestConfig)
+    #print("Configuration number:", len(interestConfig))
     
     #training_subjects_assigments = [np.random.choice([4,5,7,8,9,10,11,13,15,18,30],6,replace=False) for _ in range(5)]
     
