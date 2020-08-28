@@ -31,7 +31,7 @@ Analysis run for a 20-second window length (Linux users):
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 2000
 ```
 * You can run **FigurePanels.ipynb** in jupyter notebook to generate figure panels. Single forest results are not stored by **automatedAnalysis.py** in main analysis. For Figure 13, detailed single forest performance statistics have been generated separetely. These results are available in the data repository ("one_config").
-* Note that automatedAnalysis.py can be run for different window lengths. Please replace “2000” in the above example by any length expressed in millisecond (ex: 20 seconds  2000, 1 second  100, etc.).
+* Note that automatedAnalysis.py can be run for different window lengths. Please replace “2000” in the above example by any length expressed in millisecond (ex: 20 seconds &#8594; 2000, 1 second &#8594; 100, etc.).
 * Similarly, the automatedAnalysis.py  can be run for 3 different sets of sensor configurations:
     * 25: the 25 pre-selected sensor configurations presented in the text and the figures of the core of the manuscript.
     * 67: the sensor configurations presented in the supplementary results. Note: for the smallest window lengths, the computation time might take several days depending on the specifications of your machine.
@@ -44,7 +44,7 @@ python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 2000 67
 ```
-  Analysis run on the 25 sensor configurations included in the supplementary material section, using a 15-second window length: 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Analysis run on the 25 sensor configurations included in the supplementary material section, using a 15-second window length: 
 
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 1500 25
