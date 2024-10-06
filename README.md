@@ -1,4 +1,5 @@
 # Code for the smart shoe paper
+
 This repository contains:
 1) a program processing raw data, running the random forest training-evaluation treatment and storing the results of the smart shoe project.
 2) a notebook for generating figure panels included in the manuscript.
@@ -49,3 +50,5 @@ python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/
 ```bash
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 1500 25
 ```
+
+<a href="https://peerj.com/articles/10170/">Article<a> | <a href="https://zenodo.org/records/4050390#.YUq7A_kzYuU">Data and Code<a>
