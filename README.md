@@ -1,3 +1,5 @@
+<a href="https://peerj.com/articles/10170/">Article<a> | <a href="https://zenodo.org/records/4050390#.YUq7A_kzYuU">Data and Code<a>
+
 # Code for the smart shoe paper
 
 This repository contains:
@@ -51,4 +53,3 @@ python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/
 python3 automatedAnalysis.py /DIR/FootPressureRawData/ /DIR/config_feat_results/ 1500 25
 ```
 
-<a href="https://peerj.com/articles/10170/">Article<a> | <a href="https://zenodo.org/records/4050390#.YUq7A_kzYuU">Data and Code<a>
